@@ -1,4 +1,4 @@
-package com.stuartshannon.scratch;
+package com.stuartshannon.tripledes;
 
 /**
  * Hello world!

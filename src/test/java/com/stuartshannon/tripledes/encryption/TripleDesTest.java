@@ -1,4 +1,4 @@
-package com.stuartshannon.scratch.encryption;
+package com.stuartshannon.tripledes.encryption;
 
 import org.junit.Before;
 import org.junit.Test;

@@ -1,4 +1,4 @@
-package com.stuartshannon.scratch.encryption;
+package com.stuartshannon.tripledes.encryption;
 
 import org.apache.commons.codec.binary.Base64;
 

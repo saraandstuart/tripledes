@@ -1,4 +1,4 @@
-package com.stuartshannon.scratch.encryption;
+package com.stuartshannon.tripledes.encryption;
 
 /**
  * Created by stuartshannon on 08/07/2017.
