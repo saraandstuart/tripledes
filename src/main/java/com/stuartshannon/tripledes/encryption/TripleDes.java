@@ -32,7 +32,7 @@ public class TripleDes implements IEncryption
         this.secretKey = secretKey;
     }
 
-    public String encrypt(String message) throws Exception
+    public String encrypt(String input) throws Exception
     {
         MessageDigest md = MessageDigest.getInstance(SHA_1);
         byte[] digestOfPassword = md.digest(secretKey.getBytes(UTF_8));
@@ -42,32 +42,30 @@ public class TripleDes implements IEncryption
         Cipher cipher = Cipher.getInstance(DES_EDE);
         cipher.init(Cipher.ENCRYPT_MODE, key);
 
-        byte[] plainTextBytes = message.getBytes(UTF_8);
+        byte[] plainTextBytes = input.getBytes(UTF_8);
+
         byte[] buf = cipher.doFinal(plainTextBytes);
+        byte[] base64Bytes = Base64.encodeBase64(buf);
 
-        byte [] base64Bytes = Base64.encodeBase64(buf);
-        String base64EncryptedString = new String(base64Bytes, UTF_8);
-
-        return base64EncryptedString;
+        return new String(base64Bytes, UTF_8);
     }
 
-    public String decrypt(String encryptedText) throws Exception
+    public String decrypt(String input) throws Exception
     {
-        byte[] bytes = encryptedText.getBytes(UTF_8);
-        byte[] message = Base64.decodeBase64(bytes);
-
         MessageDigest md = MessageDigest.getInstance(SHA_1);
         byte[] digestOfPassword = md.digest(secretKey.getBytes(UTF_8));
         byte[] keyBytes = Arrays.copyOf(digestOfPassword, NEW_ARRAY_LENGTH);
 
         SecretKey key = new SecretKeySpec(keyBytes, DES_EDE);
-        Cipher decipher = Cipher.getInstance(DES_EDE);
-        decipher.init(Cipher.DECRYPT_MODE, key);
+        Cipher cipher = Cipher.getInstance(DES_EDE);
+        cipher.init(Cipher.DECRYPT_MODE, key);
 
-        byte[] plainText = decipher.doFinal(message);
-        String decryptedString = new String(plainText, UTF_8);
+        byte[] encryptedBytes = input.getBytes(UTF_8);
 
-        return decryptedString;
+        byte[] plainTextBytes = Base64.decodeBase64(encryptedBytes);
+        byte[] plainText = cipher.doFinal(plainTextBytes);
+
+        return new String(plainText, UTF_8);
     }
 
 }
