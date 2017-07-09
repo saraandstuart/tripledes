@@ -7,6 +7,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.MessageDigest;
 import java.util.Arrays;
+import java.util.function.BiFunction;
 
 /**
  * Created by stuartshannon on 08/07/2017.
@@ -34,54 +35,74 @@ public class TripleDes implements IEncryption
 
     public String encrypt(String input) throws Exception
     {
-        MessageDigest md = MessageDigest.getInstance(SHA_1);
-        byte[] digestOfPassword = md.digest(secretKey.getBytes(UTF_8));
-        byte[] keyBytes = Arrays.copyOf(digestOfPassword, NEW_ARRAY_LENGTH);
-
-        SecretKey key = new SecretKeySpec(keyBytes, DES_EDE);
-        Cipher cipher = Cipher.getInstance(DES_EDE);
-        cipher.init(Cipher.ENCRYPT_MODE, key);
-
-        byte[] plainTextBytes = input.getBytes(UTF_8);
-
-        byte[] base64Bytes = encrypt(plainTextBytes, cipher);
-
-        return new String(base64Bytes, UTF_8);
+        return templateMethod(input, Cipher.ENCRYPT_MODE, new Encryptor());
     }
 
     public String decrypt(String input) throws Exception
     {
+        return templateMethod(input, Cipher.DECRYPT_MODE, new Decryptor());
+    }
+
+    private String templateMethod(String input, int cipherMode, BiFunction<byte[], Cipher, byte[]> converter) throws Exception
+    {
+        byte[] inputBytes = input.getBytes(UTF_8);
+
+        byte[] keyBytes = keyBytes();
+        Cipher cipher = initCipher(cipherMode, keyBytes);
+
+        byte[] result = converter.apply(inputBytes, cipher);
+
+        return new String(result, UTF_8);
+    }
+
+    private static class Decryptor implements BiFunction<byte[], Cipher, byte[]>
+    {
+        public byte[] apply(byte[] input, Cipher cipher)
+        {
+            try
+            {
+                byte[] interim = Base64.decodeBase64(input);
+                return cipher.doFinal(interim);
+            }
+            catch (Exception e)
+            {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private static class Encryptor implements BiFunction<byte[], Cipher, byte[]>
+    {
+        public byte[] apply(byte[] input, Cipher cipher)
+        {
+            try
+            {
+                byte[] interim = cipher.doFinal(input);
+                return Base64.encodeBase64(interim);
+            }
+            catch (Exception e)
+            {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private byte[] keyBytes() throws Exception
+    {
         MessageDigest md = MessageDigest.getInstance(SHA_1);
         byte[] digestOfPassword = md.digest(secretKey.getBytes(UTF_8));
         byte[] keyBytes = Arrays.copyOf(digestOfPassword, NEW_ARRAY_LENGTH);
 
+        return keyBytes;
+    }
+
+    private Cipher initCipher(int cipherMode, byte[] keyBytes) throws Exception
+    {
         SecretKey key = new SecretKeySpec(keyBytes, DES_EDE);
         Cipher cipher = Cipher.getInstance(DES_EDE);
-        cipher.init(Cipher.DECRYPT_MODE, key);
+        cipher.init(cipherMode, key);
 
-        byte[] encryptedBytes = input.getBytes(UTF_8);
-
-        byte[] plainText = decrypt(encryptedBytes, cipher);
-
-        return new String(plainText, UTF_8);
-    }
-
-    private byte[] encrypt(byte[] input, Cipher cipher) throws Exception
-    {
-        byte[] interim = cipher.doFinal(input);
-
-        byte[] result = Base64.encodeBase64(interim);
-
-        return result;
-    }
-
-    private byte[] decrypt(byte[] input, Cipher cipher) throws Exception
-    {
-        byte[] interim = Base64.decodeBase64(input);
-
-        byte[] result = cipher.doFinal(interim);
-
-        return result;
+        return cipher;
     }
 
 }
