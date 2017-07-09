@@ -32,13 +32,14 @@ public class DecryptorTest
     {
         encryption = mock(IEncryption.class);
         Guice.createInjector(getTestModule()).injectMembers(this);
-
-        decryptor = new Decryptor(encryption);
     }
 
-    private Module getTestModule() {
-        return new AbstractModule() {
-            @Override protected void configure()
+    private Module getTestModule()
+    {
+        return new AbstractModule()
+        {
+            @Override
+            protected void configure()
             {
                 bind(IEncryption.class).toInstance(encryption);
                 bind(IDecryptor.class).to(Decryptor.class);
