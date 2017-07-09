@@ -44,8 +44,7 @@ public class TripleDes implements IEncryption
 
         byte[] plainTextBytes = input.getBytes(UTF_8);
 
-        byte[] buf = cipher.doFinal(plainTextBytes);
-        byte[] base64Bytes = Base64.encodeBase64(buf);
+        byte[] base64Bytes = encrypt(plainTextBytes, cipher);
 
         return new String(base64Bytes, UTF_8);
     }
@@ -62,10 +61,27 @@ public class TripleDes implements IEncryption
 
         byte[] encryptedBytes = input.getBytes(UTF_8);
 
-        byte[] plainTextBytes = Base64.decodeBase64(encryptedBytes);
-        byte[] plainText = cipher.doFinal(plainTextBytes);
+        byte[] plainText = decrypt(encryptedBytes, cipher);
 
         return new String(plainText, UTF_8);
+    }
+
+    private byte[] encrypt(byte[] input, Cipher cipher) throws Exception
+    {
+        byte[] interim = cipher.doFinal(input);
+
+        byte[] result = Base64.encodeBase64(interim);
+
+        return result;
+    }
+
+    private byte[] decrypt(byte[] input, Cipher cipher) throws Exception
+    {
+        byte[] interim = Base64.decodeBase64(input);
+
+        byte[] result = cipher.doFinal(interim);
+
+        return result;
     }
 
 }
