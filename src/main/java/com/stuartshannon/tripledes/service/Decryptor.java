@@ -1,5 +1,6 @@
 package com.stuartshannon.tripledes.service;
 
+import com.google.inject.Inject;
 import com.stuartshannon.tripledes.encryption.IEncryption;
 
 /**
@@ -9,6 +10,7 @@ public class Decryptor implements IDecryptor
 {
     private IEncryption encryption;
 
+    @Inject
     public Decryptor(IEncryption encryption)
     {
         this.encryption = encryption;
