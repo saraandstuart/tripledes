@@ -11,8 +11,8 @@ import static org.junit.Assert.assertThat;
  */
 public class TripleDesTest
 {
-    private static final String UNECRYPTED = "textToEncrypt";
-    private static final String ECRYPTED = "nkYvPcZZjyeTTj3Kw6+5Pg==";
+    private static final String PLAIN_TEXT = "textToEncrypt";
+    private static final String ENCRYPTED = "nkYvPcZZjyeTTj3Kw6+5Pg==";
 
     private IEncryption encryption;
 
@@ -26,10 +26,10 @@ public class TripleDesTest
     public void correctlyEncrypts() throws Exception
     {
         //given
-        String expected = ECRYPTED;
+        String expected = ENCRYPTED;
 
         //when
-        String actual = encryption.encrypt(UNECRYPTED);
+        String actual = encryption.encrypt(PLAIN_TEXT);
 
         //then
         assertThat(actual, is(expected));
@@ -39,10 +39,10 @@ public class TripleDesTest
     public void correctlyDecrypts() throws Exception
     {
         //given
-        String expected = UNECRYPTED;
+        String expected = PLAIN_TEXT;
 
         //when
-        String actual = encryption.decrypt(ECRYPTED);
+        String actual = encryption.decrypt(ENCRYPTED);
 
         //then
         assertThat(actual, is(expected));
